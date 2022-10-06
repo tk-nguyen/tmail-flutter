@@ -174,3 +174,5 @@ There are many ways to help us, and amongst them:
  ### **Cool. I also want to write my own email application for JMAP. Can you help me?**
  
 You would be pleased to know we contributes a [JMAP Dart client](https://github.com/linagora/jmap-dart-client) that you can reuse to write your own applications. Feels free to open pull requests and enrich it!
+
+Demo changes
