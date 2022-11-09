@@ -9,7 +9,7 @@ ENV FLUTTER_HOME="/opt/flutter"
 ENV PATH "$PATH:$FLUTTER_HOME/bin"
 
 # Prerequisites
-RUN install_packages curl git unzip xz-utils zip gzip libglu1-mesa \
+RUN install_packages curl ca-certificates git unzip xz-utils zip gzip libglu1-mesa \
  && mkdir -p $FLUTTER_HOME \
  && curl -o flutter.tar.xz $FLUTTER_URL \
  && tar xf flutter.tar.xz -C /opt \
