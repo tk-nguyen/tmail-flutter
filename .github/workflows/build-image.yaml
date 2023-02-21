@@ -1,0 +1,51 @@
+on:
+  push:
+    branches:
+      - "master"
+    tags:
+      - "v*.*.*"
+
+name: Build image
+
+jobs:
+  build-dev-image:
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'branch' && github.ref_name == 'master'
+    environment: dev
+    steps:
+      - name: Setup Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build images
+        uses: docker/build-push-action@v4
+        with:
+          cache-from: |
+            type=gha
+          cache-to: |
+            type=gha
+          load: true
+          tags: ${{ github.repository_owner }}/tmail-web:${{ github.ref_name }}
+
+      - name: List images
+        run: docker images
+
+  build-release-image:
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
+    environment: prod
+    steps:
+      - name: Setup Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build images
+        uses: docker/build-push-action@v4
+        with:
+          cache-from: |
+            type=gha
+          cache-to: |
+            type=gha
+          load: true
+          tags: ${{ github.repository_owner }}/tmail-web:${{ github.ref_name }}
+
+      - name: List images
+        run: docker images
