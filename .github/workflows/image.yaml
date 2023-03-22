@@ -18,10 +18,18 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ${{ github.repository_owner }}/tmail-web
+          tags: |
+            type=ref,event=branch
+
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
-          registry: ghcr.io
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
@@ -33,12 +41,12 @@ jobs:
             type=gha
           cache-to: |
             type=gha
-          tags: |
-            ${{ github.repository_owner }}/tmail-web:${{ github.ref_name }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
   build-release-image:
     name: Build release image
-    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/')
+    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     environment: prod
 
@@ -46,10 +54,19 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ${{ github.repository_owner }}/tmail-web
+          tags: |
+            type=ref,event=tag
+            type=raw,value=release
+
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
-          registry: ghcr.io
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
@@ -61,5 +78,5 @@ jobs:
             type=gha
           cache-to: |
             type=gha
-          tags: |
-            ${{ github.repository_owner }}/tmail-web:${{ github.ref_name }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
