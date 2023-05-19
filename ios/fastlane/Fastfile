@@ -38,7 +38,7 @@ platform :ios do
     app_store_connect_api_key(
       key_id: ENV["APPLE_KEY_ID"],
       issuer_id: ENV["APPLE_ISSUER_ID"],
-      key_filepath: "./apiKey.p8"
+      key_content: ENV["APPLE_KEY_CONTENT"]
     )
     sync_code_signing(
       type: "appstore",
@@ -56,9 +56,9 @@ platform :ios do
       workspace: "Runner.xcworkspace",
       export_method: "app-store"
     )
-    upload_to_testflight(
-      skip_waiting_for_build_processing: true,
-      ipa: "Runner.ipa"
-    )
+    # upload_to_testflight(
+    #   skip_waiting_for_build_processing: true,
+    #   ipa: "Runner.ipa"
+    # )
   end
 end
