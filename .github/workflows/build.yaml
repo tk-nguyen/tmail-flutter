@@ -1,0 +1,67 @@
+on:
+  workflow_dispatch:
+
+name: Build dev binaries
+
+jobs:
+  build-app:
+    name: Build app
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          - os: android
+            runner: ubuntu-latest
+          - os: ios
+            runner: macos-latest
+    environment: dev
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.7.5"
+          channel: "stable"
+          cache: true
+          cache-key: deps-${{ hashFiles('**/pubspec.lock') }} # optional, change this to force refresh cache
+          cache-path: ${{ runner.tool_cache }}/flutter # optional, change this to specify the cache path
+
+      - name: Setup Fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "ruby"
+          bundler-cache: true
+          working-directory: ${{ matrix.os }}
+
+      - name: Setup Firebase env
+        env:
+          FIREBASE_ENV: ${{ secrets.FIREBASE_ENV }}
+        run: echo "$FIREBASE_ENV" > ./configurations/env.fcm
+
+      - name: Setup Java
+        if: matrix.os == 'android'
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "11"
+
+      - name: Run prebuild
+        run: bash prebuild.sh
+
+      - name: Build
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          APPLE_CERTIFICATES_SSH_KEY: ${{ secrets.APPLE_CERTIFICATES_SSH_KEY }}
+        run: bundle exec fastlane dev
+        working-directory: ${{ matrix.os }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: tmail-dev
+          path: |
+            build/app/outputs/flutter-apk/app-release.apk
+            ios/Runner.ipa

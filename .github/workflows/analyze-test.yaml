@@ -1,6 +1,10 @@
 on:
-  workflow_call:
-  workflow_dispatch:
+  pull_request:
+    paths-ignore:
+      - ".github/**"
+      - "docs"
+      - "Jenkinsfile"
+      - "**/*.md"
 
 name: Analyze and test
 

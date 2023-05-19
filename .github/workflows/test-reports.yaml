@@ -1,8 +1,7 @@
 on:
   workflow_run:
     workflows:
-      - "CI"
-      - "Release"
+      - "Analyze and test"
     types:
       - completed
 
