@@ -9,9 +9,7 @@ if [[ "$RUNNER_OS" == "Linux" ]]; then
 elif [[ "$RUNNER_OS" == "macOS" ]]; then
     (\
         cd ios; \
-        echo "$APPLE_CERTIFICATES_SSH_KEY" > apple-cert-key; \
-        fastlane match appstore git_private_key:"$(pwd)/apple-cert-key" --readonly; \
-        rm apple-cert-key \
+        fastlane match appstore --readonly; \
     )
 fi
 

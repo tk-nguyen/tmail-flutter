@@ -62,6 +62,12 @@ jobs:
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@master
 
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        if: matrix.os == 'ios'
+        with:
+          ssh-private-key: ${{ secrets.APPLE_CERTIFICATES_SSH_KEY }}
+
       - name: Set up Java
         if: matrix.os == 'android'
         uses: actions/setup-java@v4
@@ -72,7 +78,6 @@ jobs:
       - name: Setup integration tests
         env:
           TMAIL_PATROL_CREDENTIALS: ${{ secrets.TMAIL_PATROL_CREDENTIALS }}
-          APPLE_CERTIFICATES_SSH_KEY: ${{ secrets.APPLE_CERTIFICATES_SSH_KEY }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         run: ./scripts/setup-mobile-integration-tests.sh
 
