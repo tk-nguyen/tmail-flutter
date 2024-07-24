@@ -39,7 +39,15 @@ jobs:
 
   mobile_integration_test:
     name: Run integration tests on mobile apps
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          - os: ios
+            runner: macos-latest
+          - os: android
+            runner: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -51,18 +59,21 @@ jobs:
           channel: "stable"
           cache: true
 
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
       - name: Set up Java
+        if: matrix.os == 'android'
         uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: "temurin"
 
-      - name: Set up Homebrew
-        uses: Homebrew/actions/setup-homebrew@master
-
       - name: Setup integration tests
         env:
           TMAIL_PATROL_CREDENTIALS: ${{ secrets.TMAIL_PATROL_CREDENTIALS }}
+          APPLE_CERTIFICATES_SSH_KEY: ${{ secrets.APPLE_CERTIFICATES_SSH_KEY }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         run: ./scripts/setup-mobile-integration-tests.sh
 
       - name: Run integration tests
