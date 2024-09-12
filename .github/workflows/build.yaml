@@ -1,7 +1,10 @@
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 11 * * *"
+  workflow_run:
+    workflows:
+      - "Analyze and test"
+    types:
+      - completed
 
 name: Build dev binaries
 
@@ -13,6 +16,7 @@ jobs:
   build-app:
     name: Build app
     runs-on: ${{ matrix.runner }}
+    if: github.event.workflow_run.conclusion == 'success'
     strategy:
       matrix:
         include:
