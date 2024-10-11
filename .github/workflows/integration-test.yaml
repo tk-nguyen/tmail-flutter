@@ -2,6 +2,8 @@ name: Integration tests
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
 
 env:
   JAVA_VERSION: 17
@@ -15,6 +17,9 @@ jobs:
 
     name: Run integration tests for mobile apps
     runs-on: ubuntu-latest
+    concurrency:
+      group: tunnelmole
+      cancel-in-progress: false
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -29,5 +34,21 @@ jobs:
       - name: Setup Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: "stable"
+          cache: true
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: "temurin"
+
+      - name: Run prebuild
+        run: ./scripts/prebuild.sh
+
       - name: Test
-        run: gcloud firebase test android models list
+        run: ./scripts/integration-test-with-docker.sh
