@@ -1,10 +1,8 @@
 #!/bin/bash
 
 # Install ngrok
-echo "Installing ngrok..."
-curl -sSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null &&
-    echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list &&
-    sudo apt update && sudo apt install ngrok
+echo "Installing tunnelmole..."
+npm install -g tunnelmole
 
 # Install patrol CLI
 echo "Installing patrol CLI..."
@@ -12,13 +10,13 @@ dart pub global activate patrol_cli
 flutter build apk --config-only
 
 # Forward traffic to tmail-backend
-ngrok http http://localhost:80 --log=stdout >/dev/null &
-until [[ $(curl localhost:4040/api/status | jq -r ".status") == "online" ]]; do
-    echo "Waiting for ngrok to connect..."
+tmole --port 80 >tmole.log 2>&1 &
+until grep 'https' tmole.log; do
+    echo "Waiting for tunnelmole to connect..."
     sleep 2
 done
 
-export BASIC_AUTH_URL=$(curl -s localhost:4040/api/tunnels | jq -r '.tunnels[0].public_url')
+export BASIC_AUTH_URL=$(grep 'https' tmole.log | awk '{ print $1 }')
 
 cd backend-docker
 
