@@ -1,8 +1,9 @@
 import '../base/base_scenario.dart';
 import '../robots/login_robot.dart';
 import '../robots/thread_robot.dart';
+import '../utils/scenario_utils_mixin.dart';
 
-class LoginWithBasicAuth extends BaseScenario {
+class LoginWithBasicAuth extends BaseScenario with ScenarioUtilsMixin {
   const LoginWithBasicAuth(
     super.$, 
     {
@@ -31,7 +32,7 @@ class LoginWithBasicAuth extends BaseScenario {
     await loginRobot.enterBasicAuthPassword(password);
     await loginRobot.loginBasicAuth();
 
-    await threadRobot.grantNotificationPermission();
+    await grantNotificationPermission($.native);
 
     await threadRobot.expectThreadViewVisible();
   }

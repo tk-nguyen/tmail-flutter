@@ -12,10 +12,4 @@ abstract class CoreRobot {
   }
 
   dynamic ignoreException() => $.tester.takeException();
-
-  Future<void> grantNotificationPermission() async {
-    if (await $.native.isPermissionDialogVisible(timeout: const Duration(seconds: 5))) {
-      await $.native.grantPermissionWhenInUse();
-    }
-  }
 }
