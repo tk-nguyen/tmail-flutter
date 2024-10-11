@@ -17,6 +17,9 @@ jobs:
 
     name: Run integration tests for mobile apps
     runs-on: ubuntu-latest
+    concurrency:
+      group: ngrok
+      cancel-in-progress: false
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
